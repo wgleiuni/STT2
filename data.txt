@@ -1,12 +1,5 @@
-0.01 %alpha
-0.1 %kappa
-27.2746 %mu
-13.931 %nu
-5.0e9 %f
-176.086e9 %gammaB
-0.5 %V
-0.001 %dt
-8000 %time when stop
-100 %step between output
+0.01 0.1 27.2746 13.931 % 1:alpha 2:kappa 3:mu 4:nu
+0.5 5.0e9 176.086e9 % 1:V 2:f 3:gammaB
+0.002 8000 1000 % 1:dt 2:time when step 3:step between output
 0 0 0.1 %b, driving
 0 0.7071 0.7071 %initial condition
