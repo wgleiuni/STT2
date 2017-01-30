@@ -16,9 +16,11 @@ Single::Single(double alpha,double v,int id) {
     _k2.resize(3);
     _k3.resize(3);
     _k4.resize(3);
+    _stable.resize(0);
     _alpha=alpha;
     _v=v;
     _t=0;
+    _sstable=100;
     if (P->_numdt!=-1) {
         string name="result"+to_string(id)+".txt";
         _ofile.open(name,fstream::out);
@@ -48,6 +50,7 @@ void Single::RK4_onestep() {
     for (int i=0;i<3;i++) _ty[i]=_y[i]+P->_h*_k3[i];
     RK4_df(_t+P->_h,_k4);
     for (int i=0;i<3;i++) _y[i]+=P->_h/6.*(_k1[i]+2.*_k2[i]+2.*_k3[i]+_k4[i]);
+    if (_cnt++%_sstable==0) check_stable();
     if (P->_numdt!=-1 && _cnt%P->_numdt==0) _ofile << _t << "\t" << _y[0] << "\t" << _y[1] << "\t" << _y[2] << endl;
     return;
 }
@@ -62,6 +65,30 @@ void Single::RK4_df(double t,vector<double>& k) {
     k[0]=-(b[2]*_ty[1]+_alpha*b[1]*_ty[0]*_ty[1]-_alpha*b[0]*_ty[1]*_ty[1]-b[1]*_ty[2]+_alpha*b[2]*_ty[0]*_ty[2]-_alpha*b[0]*_ty[2]*_ty[2])/denom;
     k[1]=-(-b[2]*_ty[0]+_alpha*b[0]*_ty[0]*_ty[1]-_alpha*b[1]*_ty[0]*_ty[0]+b[0]*_ty[2]+_alpha*b[2]*_ty[1]*_ty[2]-_alpha*b[1]*_ty[2]*_ty[2])/denom;
     k[2]=-(b[1]*_ty[0]+_alpha*b[1]*_ty[1]*_ty[2]-_alpha*b[2]*_ty[0]*_ty[0]-b[0]*_ty[1]+_alpha*b[0]*_ty[0]*_ty[2]-_alpha*b[2]*_ty[1]*_ty[1])/denom;
+    return;
+}
+
+void Single::check_stable() {
+    if (_stable.size()<10) {
+        _stable.push_back(_y[1]);
+        return;
+    }
+    if (fabs(_y[1]-_stable.back())>1e-10) {
+        _stable.pop_back();
+        _stable.insert(_stable.begin(),_y[1]);
+        return;
+    }
+    else {
+        _stable.pop_back();
+        _stable.insert(_stable.begin(),_y[1]);
+        bool cond=true;
+        for (int i=1;i<_stable.size();i++) {
+            if (fabs(_stable[0]-_stable[i])>1e-10) cond=false;
+        }
+        if (cond) {
+            _t=P->_totT;
+        }
+    }
     return;
 }
 

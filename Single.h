@@ -12,10 +12,11 @@ class Single {
         virtual double getforce()=0;
         Parameter *P;
         double _alpha,_v,_t;
-        vector<double> _y,_ty,_k1,_k2,_k3,_k4;
+        vector<double> _y,_ty,_k1,_k2,_k3,_k4,_stable;
         fstream _ofile;
-        int _cnt=0;
+        int _cnt=0,_sstable;
         void RK4_onestep();
+        void check_stable();
         void RK4_df(double,vector<double>&);
 };
 

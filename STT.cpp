@@ -27,12 +27,16 @@ STT::STT() {
         double step=(end-begin)/(num-1);
         for (int i=0;i<num;i++) _Vv.push_back(begin+i*step);
     }
+    if (getline(infile,line)) {
+        istringstream iss(line);
+        iss>>_nthread;
+    }
     _res=vector<vector<double>> (_Valpha.size(),vector<double> (_Vv.size(),0.0));
 }
 
 void STT::run_one(int x,int y) {
     unique_ptr<Single> p;
-    int id=x*_Valpha.size()+y;
+    int id=x*_Vv.size()+y;
     if (P->_v.size()==1) {
         p=unique_ptr<Single_static> (new Single_static(_Valpha[x],_Vv[y],id));
     }
@@ -51,21 +55,22 @@ void STT::run() {
     for (int i=0;i<_Valpha.size();i++)
         for (int j=0;j<_Vv.size();j++)
             q.push({i,j});
-    vector<thread> workers (10);
+    vector<thread> workers (_nthread);
     int tot=q.size();
     while (!q.empty()) {
-        for (int i=0;i<10;i++) {
+        for (int i=0;i<_nthread;i++) {
             if (!q.empty()) {
                 workers[i]=thread([=]{run_one(q.front().first,q.front().second);});
                 q.pop();
             }
             else break;
         }
-        for (int i=0;i<10;i++)
+        for (int i=0;i<_nthread;i++)
             if (workers[i].joinable()) workers[i].join();
         double cur=50*(tot-q.size())/((double)tot);
-        string scur="["+string((int)cur,'=')+">"+string(50-(int)cur,' ')+"]"+to_string((int)cur*2);
-        cout << scur << "%\r";
+        string scur="["+string((int)cur,'=')+">"+string(50-(int)cur,' ')+"]";
+        cout.precision(4);
+        cout << scur << 2*cur << "%\r";
         cout.flush();
     }
     record();
