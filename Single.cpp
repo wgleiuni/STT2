@@ -33,7 +33,7 @@ double Single_static::getforce() {
 }
 
 double Single_pulse::getforce() {
-    return _v*pow(fabs(sin(M_PI*_t/P->_v[1])),P->_v[1]/_t);
+    return _v*pow(fabs(sin(M_PI*_t/P->_v[1])),2.*P->_v[1]/_t);
 }
 
 double Single_periodic::getforce() {
