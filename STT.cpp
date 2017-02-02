@@ -5,6 +5,7 @@
 #include <string>
 #include <queue>
 #include <memory>
+#include <mutex>
 #include <boost/asio/io_service.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
@@ -34,6 +35,9 @@ STT::STT() {
         iss>>_mode>>_nthread;
     }
     _res=vector<vector<double>> (_Valpha.size(),vector<double> (_Vv.size(),0.0));
+    _cnt=0;
+    _tot=_Valpha.size()*_Vv.size();
+    _ofile.open("Runtime_result.txt",fstream::out);
 }
 
 void STT::run_one(int x,int y) {
@@ -43,13 +47,28 @@ void STT::run_one(int x,int y) {
         p=unique_ptr<Single_static> (new Single_static(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==2) {
+        cout << "pulse" << endl;
         p=unique_ptr<Single_pulse> (new Single_pulse(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==3) {
         p=unique_ptr<Single_periodic> (new Single_periodic(_Valpha[x],_Vv[y],id,_mode));
     }
     _res[x][y]=p->go();
+//    single_rec(x,y);
     return;
+}
+
+void STT::single_rec(int i,int j) {
+    _m.lock();
+    _ofile << _Valpha[i] << "\t" << _Vv[j] << "\t" << _res[i][j] << "\n";
+
+    double cur=50*(++_cnt)/((double)_tot);
+    string scur="["+string((int)cur,'=')+">"+string(50-(int)cur,' ')+"]";
+    cout.precision(4);
+    cout << scur << 2*cur << "%\r";
+    cout.flush();
+
+    _m.unlock();
 }
 
 void STT::run() {
@@ -61,33 +80,13 @@ void STT::run() {
     }
     for (auto i:_Valpha) {
         for (auto j:_Vv) {
+            cout << i << " " << j << endl;
             ioService.post(boost::bind(&STT::run_one,this,i,j));
         }
     }
     ioService.stop();
     threadpool.join_all();
-//    queue<pair<int,int>> q;
-//    for (int i=0;i<_Valpha.size();i++)
-//        for (int j=0;j<_Vv.size();j++)
-//            q.push({i,j});
-//    vector<thread> workers (_nthread);
-//    int tot=q.size();
-//    while (!q.empty()) {
-//        for (int i=0;i<_nthread;i++) {
-//            if (!q.empty()) {
-//                workers[i]=thread([=]{run_one(q.front().first,q.front().second);});
-//                q.pop();
-//            }
-//            else break;
-//        }
-//        for (int i=0;i<_nthread;i++)
-//            if (workers[i].joinable()) workers[i].join();
-//        double cur=50*(tot-q.size())/((double)tot);
-//        string scur="["+string((int)cur,'=')+">"+string(50-(int)cur,' ')+"]";
-//        cout.precision(4);
-//        cout << scur << 2*cur << "%\r";
-//        cout.flush();
-//    }
+//    ioService.stop();
     record();
     return;
 }
