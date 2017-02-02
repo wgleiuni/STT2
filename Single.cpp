@@ -8,7 +8,7 @@
 #include "Single.h"
 #include "Para.h"
 using namespace std;
-Single::Single(double alpha,double v,int id) {
+Single::Single(double p1,double p2,int id,int mode) {
     P=Parameter::getInstance();
     _y=P->_y;
     _ty.resize(3);
@@ -17,15 +17,45 @@ Single::Single(double alpha,double v,int id) {
     _k3.resize(3);
     _k4.resize(3);
     _stable.resize(0);
-    _alpha=alpha;
-    _v=v;
+    _alpha=P->_alpha;
+    _v=P->_v[0];
     _t=0;
     _sstable=100;
     if (P->_numdt!=-1) {
         string name="result"+to_string(id)+".txt";
         _ofile.open(name,fstream::out);
     }
-    _ofile << alpha << " " << v << endl;
+    _ofile << p1 << " " << p2 << endl;
+}
+
+void Single_static::set(double p1,double p2,int mode) {
+    if (mode==1) {
+        _alpha=p1;
+        _v=p2;
+    }
+}
+
+void Single_pulse::set(double p1,double p2,int mode) {
+    _tau=P->_v[1];
+    switch (mode) {
+        case 1:
+            _alpha=p1;
+            _v=p2;
+            break;
+        case 2:
+            _tau=p1;
+            _v=p2;
+            break;
+    }
+}
+
+void Single_periodic::set(double p1,double p2,int mode) {
+    switch (mode) {
+        case 1:
+            _alpha=p1;
+            _v=p2;
+            break;
+    }
 }
 
 double Single_static::getforce() {
@@ -33,7 +63,7 @@ double Single_static::getforce() {
 }
 
 double Single_pulse::getforce() {
-    return _v*pow(fabs(sin(M_PI*_t/P->_v[1])),2.*P->_v[1]/_t);
+    return _v*pow(fabs(sin(M_PI*_t/_tau)),2.*_tau/_t);
 }
 
 double Single_periodic::getforce() {

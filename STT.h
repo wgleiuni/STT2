@@ -13,6 +13,6 @@ class STT {
         vector<vector<double>> _res;
         void run_one(int,int);
         void record();
-        int _nthread;
+        int _mode,_nthread;
 };
 #endif

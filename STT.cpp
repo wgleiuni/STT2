@@ -29,7 +29,7 @@ STT::STT() {
     }
     if (getline(infile,line)) {
         istringstream iss(line);
-        iss>>_nthread;
+        iss>>_mode>>_nthread;
     }
     _res=vector<vector<double>> (_Valpha.size(),vector<double> (_Vv.size(),0.0));
 }
@@ -38,13 +38,13 @@ void STT::run_one(int x,int y) {
     unique_ptr<Single> p;
     int id=x*_Vv.size()+y;
     if (P->_v.size()==1) {
-        p=unique_ptr<Single_static> (new Single_static(_Valpha[x],_Vv[y],id));
+        p=unique_ptr<Single_static> (new Single_static(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==2) {
-        p=unique_ptr<Single_pulse> (new Single_pulse(_Valpha[x],_Vv[y],id));
+        p=unique_ptr<Single_pulse> (new Single_pulse(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==3) {
-        p=unique_ptr<Single_periodic> (new Single_periodic(_Valpha[x],_Vv[y],id));
+        p=unique_ptr<Single_periodic> (new Single_periodic(_Valpha[x],_Vv[y],id,_mode));
     }
     _res[x][y]=p->go();
     return;
