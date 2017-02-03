@@ -47,14 +47,13 @@ void STT::run_one(int x,int y) {
         p=unique_ptr<Single_static> (new Single_static(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==2) {
-        cout << "pulse" << endl;
         p=unique_ptr<Single_pulse> (new Single_pulse(_Valpha[x],_Vv[y],id,_mode));
     }
     else if (P->_v.size()==3) {
         p=unique_ptr<Single_periodic> (new Single_periodic(_Valpha[x],_Vv[y],id,_mode));
     }
     _res[x][y]=p->go();
-//    single_rec(x,y);
+    single_rec(x,y);
     return;
 }
 
@@ -78,15 +77,14 @@ void STT::run() {
     for (int i=0;i<_nthread;i++) {
         threadpool.create_thread(boost::bind(&boost::asio::io_service::run,&ioService));
     }
-    for (auto i:_Valpha) {
-        for (auto j:_Vv) {
-            cout << i << " " << j << endl;
+    for (int i=0;i<_Valpha.size();i++) {
+        for (int j=0;j<_Vv.size();j++) {
             ioService.post(boost::bind(&STT::run_one,this,i,j));
         }
     }
+    ioService.poll();
     ioService.stop();
     threadpool.join_all();
-//    ioService.stop();
     record();
     return;
 }
