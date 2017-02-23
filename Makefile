@@ -1,5 +1,5 @@
 CC=icpc
-CFLAG=-I /home/quantum/bin/ -g -Wall -std=c++11 -L /usr/local/lib -lboost_thread -lboost_system
+CFLAG=-g -Wall -std=c++11 -L /usr/local/lib -lboost_thread -lboost_system
 BIN=Solution
 
 SRC=main.cpp Para.cpp Para.h Single.cpp Single.h STT.cpp STT.h
