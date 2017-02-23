@@ -102,17 +102,17 @@ void Single::RK4_df(double t,vector<double>& k) {
 
 void Single::check_stable() {
     if (_stable.size()<10) {
-        _stable.push_back(_y[1]);
+        _stable.push_back(_y[P->_o]);
         return;
     }
     if (fabs(_y[1]-_stable.back())>1e-10) {
         _stable.pop_back();
-        _stable.insert(_stable.begin(),_y[1]);
+        _stable.insert(_stable.begin(),_y[P->_o]);
         return;
     }
     else {
         _stable.pop_back();
-        _stable.insert(_stable.begin(),_y[1]);
+        _stable.insert(_stable.begin(),_y[P->_o]);
         bool cond=true;
         for (int i=1;i<_stable.size();i++) {
             if (fabs(_stable[0]-_stable[i])>1e-10) cond=false;
@@ -129,5 +129,5 @@ double Single::go() {
         RK4_onestep();
         _t+=P->_h;
     }
-    return _y[1];
+    return _y[P->_o];
 }

@@ -1,5 +1,5 @@
-0.01 0.1 0.0 13.931 % 1:alpha 2:kappa 3:mu 4:nu
+0.01 0.1 0.0 13.931 2 % 1:alpha 2:kappa 3:mu 4:nu 5:output component
 0.5 1.0 % 1:V 2:f 5.0e9 3:gammaB 176.086e9
 0.002 32000 200 % 1:dt 2:time when step 3:step between output
-0 0 0.1 %b, driving
+0 0 -0.1 %b, driving
 0.0 1.0 0.0 %initial condition

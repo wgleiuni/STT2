@@ -24,7 +24,7 @@ void Parameter::read() {
     string line;
     if (getline(infile,line)) {
         istringstream iss(line);
-        iss>>_alpha>>_kappa>>_mu>>_nu;
+        iss>>_alpha>>_kappa>>_mu>>_nu>>_o;
     }
     if (getline(infile,line)) {
         istringstream iss(line);

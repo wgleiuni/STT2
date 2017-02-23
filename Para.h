@@ -9,7 +9,7 @@ class Parameter {
         // member data
         double _alpha,_mu,_kappa,_nu,_h,_totT;
         vector<double> _y,_b,_v;
-        int _numdt;
+        int _numdt,_o;
         static Parameter *_instance;
 
         // member method
