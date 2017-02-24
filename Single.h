@@ -5,11 +5,11 @@
 using namespace std;
 class Single {
     public:
-        Single(double,double,int,int);
+        Single(double,double,int);
         double go();
         virtual ~Single(){};
     protected:
-        virtual double getforce()=0;
+        virtual double getforce(double)=0;
         virtual void set(double,double,int)=0;
         Parameter *P;
         double _alpha,_v,_t;
@@ -22,24 +22,24 @@ class Single {
 };
 
 class Single_static : public Single {
-    double getforce();
+    double getforce(double);
     void set(double,double,int);
     public:
-    Single_static(double x,double y,int id,int mode) : Single(x,y,id,mode) {set(x,y,mode);}
+    Single_static(double x,double y,int id,int mode) : Single(x,y,id) {set(x,y,mode);}
 };
 
 class Single_pulse : public Single {
-    double getforce();
+    double getforce(double);
     void set(double,double,int);
     double _tau;
     public:
-    Single_pulse(double x,double y,int id,int mode) : Single(x,y,id,mode) {set(x,y,mode);}
+    Single_pulse(double x,double y,int id,int mode) : Single(x,y,id) {set(x,y,mode);}
 };
 
 class Single_periodic : public Single {
-    double getforce();
+    double getforce(double);
     void set(double,double,int);
     public:
-    Single_periodic(double x,double y,int id,int mode) : Single(x,y,id,mode) {set(x,y,mode);}
+    Single_periodic(double x,double y,int id,int mode) : Single(x,y,id) {set(x,y,mode);}
 };
 #endif

@@ -7,7 +7,7 @@ class Parameter {
         static Parameter* getInstance();
     private:
         // member data
-        double _alpha,_mu,_kappa,_nu,_h,_totT;
+        double _alpha,_mu,_kappa,_nu,_h,_totT,_error;
         vector<double> _y,_b,_v;
         int _numdt,_o;
         static Parameter *_instance;

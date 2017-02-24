@@ -8,7 +8,7 @@
 #include "Single.h"
 #include "Para.h"
 using namespace std;
-Single::Single(double p1,double p2,int id,int mode) {
+Single::Single(double p1,double p2,int id) {
     P=Parameter::getInstance();
     _y=P->_y;
     _ty.resize(3);
@@ -58,18 +58,17 @@ void Single_periodic::set(double p1,double p2,int mode) {
     }
 }
 
-double Single_static::getforce() {
+double Single_static::getforce(double) {
     return _v;
 }
 
-double Single_pulse::getforce() {
-    if (_t<_tau) return _v;
+double Single_pulse::getforce(double t) {
+    if (t<_tau) return _v;
     else return 0;
-//    return _v*pow(fabs(sin(M_PI*_t/_tau)),2.*_tau/_t);
 }
 
-double Single_periodic::getforce() {
-    return _v*sin(2*M_PI*P->_v[1]/P->_v[2]*_t);
+double Single_periodic::getforce(double t) {
+    return _v*sin(2*M_PI*P->_v[1]/P->_v[2]*t);
 }
 
 void Single::RK4_onestep() {
@@ -89,7 +88,7 @@ void Single::RK4_onestep() {
 
 void Single::RK4_df(double t,vector<double>& k) {
     vector<double> b (3);
-    double v=getforce();
+    double v=getforce(t);
     b[0]=(1.0-P->_mu*(_ty[0]*P->_b[0]+_ty[1]*P->_b[1]+_ty[2]*P->_b[2])-P->_nu*v)*P->_b[0];
     b[1]=(1.0-P->_mu*(_ty[0]*P->_b[0]+_ty[1]*P->_b[1]+_ty[2]*P->_b[2])-P->_nu*v)*P->_b[1]+P->_kappa*_ty[1];
     b[2]=(1.0-P->_mu*(_ty[0]*P->_b[0]+_ty[1]*P->_b[1]+_ty[2]*P->_b[2])-P->_nu*v)*P->_b[2];
@@ -105,7 +104,7 @@ void Single::check_stable() {
         _stable.push_back(_y[P->_o]);
         return;
     }
-    if (fabs(_y[1]-_stable.back())>1e-10) {
+    if (fabs(_y[P->_o]-_stable.back())>P->_error) {
         _stable.pop_back();
         _stable.insert(_stable.begin(),_y[P->_o]);
         return;
@@ -114,8 +113,8 @@ void Single::check_stable() {
         _stable.pop_back();
         _stable.insert(_stable.begin(),_y[P->_o]);
         bool cond=true;
-        for (int i=1;i<_stable.size();i++) {
-            if (fabs(_stable[0]-_stable[i])>1e-10) cond=false;
+        for (int i=1;i<(int)_stable.size();i++) {
+            if (fabs(_stable[0]-_stable[i])>P->_error) cond=false;
         }
         if (cond) {
             _t=P->_totT;

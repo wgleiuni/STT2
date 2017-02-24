@@ -33,7 +33,7 @@ void Parameter::read() {
     }
     if (getline(infile,line)) {
         istringstream iss(line);
-        iss>>_h>>_totT>>_numdt;
+        iss>>_h>>_totT>>_numdt>>_error;
     }
     if (getline(infile,line)) {
         istringstream iss(line);
